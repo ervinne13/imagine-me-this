@@ -1,35 +1,29 @@
 import './selfie-capture.scss';
+import template from './template.html?raw';
 
 class SelfieCapture extends HTMLElement {
-  connectedCallback() {
-    this.innerHTML = `
-      <div class="selfie-container">
-        <video id="video" autoplay playsinline></video>
-        <button id="capture">📸 Take Selfie</button>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <img id="photo" alt="Selfie Preview" />
-      </div>
-    `;
-    this.setup();
-  }
-
   setup() {
-    const video = this.querySelector('#video');
-    const canvas = this.querySelector('#canvas');
-    const photo = this.querySelector('#photo');
-    const captureBtn = this.querySelector('#capture');
+    this.video = this.querySelector('#video');
+    this.canvas = this.querySelector('#canvas');
+    this.photo = this.querySelector('#photo');
+    this.captureBtn = this.querySelector('#capture');
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-      .then(stream => video.srcObject = stream)
+      .then(stream => this.video.srcObject = stream)
       .catch(err => alert('Camera access denied: ' + err));
 
-    captureBtn.onclick = () => {
-      const ctx = canvas.getContext('2d');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      photo.src = canvas.toDataURL('image/jpeg');
+    this.captureBtn.onclick = () => {
+      const ctx = this.canvas.getContext('2d');
+      this.canvas.width = this.video.videoWidth;
+      this.canvas.height = this.video.videoHeight;
+      ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+      this.photo.src = this.canvas.toDataURL('image/jpeg');
     };
+  }
+
+  connectedCallback() {
+    this.innerHTML = template;
+    this.setup();
   }
 }
 
