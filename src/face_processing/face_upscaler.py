@@ -10,7 +10,7 @@ def upscale_and_resize_face(input_path, output_path, size=512):
     img = cv2.imread(input_path)
 
     if img is None:
-        raise FileNotFoundError(f"Image not found or could not be read as an image: {input_path}")
+        raise ValueError(f"Invalid image file or unsupported format: {input_path}")
 
     upscaled = cv2.resize(img, (size, size), interpolation=cv2.INTER_CUBIC)
     cv2.imwrite(output_path, upscaled)

@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from fastapi.responses import JSONResponse
 from src.face_processing.face_cropper import crop_face
 from src.face_processing.face_upload import save_upload_file
 from src.face_processing.face_upscaler import upscale_and_resize_face

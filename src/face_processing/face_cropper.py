@@ -21,7 +21,7 @@ def crop_face(image_path, output_folder, timestamp, ext='.png'):
     if len(faces) == 0:
         return None  # No face found
 
-    # This thing can detect multiple faces, only get [0]
+        # Use the first detected face if multiple faces are found
     x, y, w, h = faces[0]
     face_img = img[y:y+h, x:x+w]
     cropped_name = f"{timestamp}-cropped{ext}"

@@ -29,7 +29,7 @@ class SelfieCapture extends HTMLElement {
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
       .then(stream => this.video.srcObject = stream)
-      .catch(err => alert('Camera access denied: ' + err));
+  .catch(err => this.showError('Camera access denied: ' + err));
   }
 
   onCaptureSelfie() {
@@ -48,7 +48,7 @@ class SelfieCapture extends HTMLElement {
     // Get the data URL from the <img>
     const dataUrl = this.photo.src;
     if (!dataUrl) {
-      alert('No selfie to upload!');
+      this.showError('No selfie to upload!');
       return;
     }
 
@@ -64,10 +64,11 @@ class SelfieCapture extends HTMLElement {
         body: formData
       });
       const data = await res.json();
+      this.setSelfieTaken(false);
+      // TODO: Implement redirect here once the next page is done
       alert(data.message || 'Uploaded!');
     } catch (e) {
-      this.setSelfieTaken(false);
-      alert('Upload failed: ' + (e && e.message ? e.message : String(e)));
+      this.showError('Upload failed: ' + (e && e.message ? e.message : String(e)));
     }
   }
 
@@ -97,6 +98,12 @@ class SelfieCapture extends HTMLElement {
       this.containers.takingState.classList.remove('hidden');
       this.containers.takenState.classList.add('hidden');
     }
+  }
+
+  showError(msg) {
+    this.setSelfieTaken(false);
+    // TODO: Implement toast messages later
+    alert(msg);
   }
 }
 
