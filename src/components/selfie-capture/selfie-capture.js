@@ -19,6 +19,9 @@ class SelfieCapture extends HTMLElement {
     this.captureBtn = this.querySelector('[data-el="sc-capture-btn"]');
     this.proceedBtn = this.querySelector('[data-el="sc-proceed-btn"]');
 
+    // Mirror the video preview, it's hard to take a selfie otherwise
+    this.video.style.transform = 'scaleX(-1)';
+
     this.containers = {
       takingState: this.querySelector('[data-container-state="taking"]'),
       takenState: this.querySelector('[data-container-state="taken"]')
@@ -48,12 +51,12 @@ class SelfieCapture extends HTMLElement {
       alert('No selfie to upload!');
       return;
     }
+
     // Convert dataURL to Blob
     const blob = await (await fetch(dataUrl)).blob();
     const formData = new FormData();
     formData.append('file', blob, 'selfie.jpg');
 
-    // Get backend URL from .env (Vite exposes env vars as import.meta.env)
     const baseUrl = import.meta.env.VITE_FASTAPI_BASE_URL || import.meta.env.FASTAPI_BASE_URL || 'http://localhost:9000';
     try {
       const res = await fetch(`${baseUrl}/api/v1/use-face`, {
@@ -63,7 +66,8 @@ class SelfieCapture extends HTMLElement {
       const data = await res.json();
       alert(data.message || 'Uploaded!');
     } catch (e) {
-      alert('Upload failed: ' + e);
+      this.setSelfieTaken(false);
+      alert('Upload failed: ' + (e && e.message ? e.message : String(e)));
     }
   }
 
