@@ -7,8 +7,8 @@ class SelfieCapture extends HTMLElement {
     this.states = {
       selfieTaken: false
     };
-
     this._captureSelfieListener = null;
+    this._proceedListener = null;
   }
 
   setup() {
@@ -17,6 +17,7 @@ class SelfieCapture extends HTMLElement {
     this.canvas = this.querySelector('[data-el="sc-canvas"]');
     this.photo = this.querySelector('[data-el="sc-photo"]');
     this.captureBtn = this.querySelector('[data-el="sc-capture-btn"]');
+    this.proceedBtn = this.querySelector('[data-el="sc-proceed-btn"]');
 
     this.containers = {
       takingState: this.querySelector('[data-container-state="taking"]'),
@@ -40,15 +41,46 @@ class SelfieCapture extends HTMLElement {
     this.setSelfieTaken(true);
   }
 
+  async onProceed() {
+    // Get the data URL from the <img>
+    const dataUrl = this.photo.src;
+    if (!dataUrl) {
+      alert('No selfie to upload!');
+      return;
+    }
+    // Convert dataURL to Blob
+    const blob = await (await fetch(dataUrl)).blob();
+    const formData = new FormData();
+    formData.append('file', blob, 'selfie.jpg');
+
+    // Get backend URL from .env (Vite exposes env vars as import.meta.env)
+    const baseUrl = import.meta.env.VITE_FASTAPI_BASE_URL || import.meta.env.FASTAPI_BASE_URL || 'http://localhost:9000';
+    try {
+      const res = await fetch(`${baseUrl}/api/v1/use-face`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      alert(data.message || 'Uploaded!');
+    } catch (e) {
+      alert('Upload failed: ' + e);
+    }
+  }
+
   connectedCallback() {
     this.setup();
     this._captureSelfieListener = this.onCaptureSelfie.bind(this);
     this.captureBtn.addEventListener('click', this._captureSelfieListener);
+    this._proceedListener = this.onProceed.bind(this);
+    this.proceedBtn.addEventListener('click', this._proceedListener);
   }
 
   disconnectedCallback() {
     if (this._captureSelfieListener) {
       this.captureBtn.removeEventListener('click', this._captureSelfieListener);
+    }
+    if (this._proceedListener) {
+      this.proceedBtn.removeEventListener('click', this._proceedListener);
     }
   }
 
