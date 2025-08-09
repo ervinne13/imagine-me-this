@@ -1,9 +1,7 @@
 import os
 import re
-import re
 
 def save_upload_file(upload_folder, upload_file, timestamp):
-    base_name = os.path.basename(upload_file.filename)
     base_name = sanitize_filename(upload_file.filename)
     safe_name = f"{timestamp}-{base_name}"
     file_path = os.path.join(upload_folder, safe_name)
