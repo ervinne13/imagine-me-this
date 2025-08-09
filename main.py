@@ -4,7 +4,6 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from src.face_processing.face_processor import process_face_upload
-from datetime import datetime
 
 load_dotenv()
 
