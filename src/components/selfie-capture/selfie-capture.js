@@ -7,8 +7,8 @@ class SelfieCapture extends HTMLElement {
     this.states = {
       selfieTaken: false
     };
-
     this._captureSelfieListener = null;
+    this._proceedListener = null;
   }
 
   setup() {
@@ -17,6 +17,10 @@ class SelfieCapture extends HTMLElement {
     this.canvas = this.querySelector('[data-el="sc-canvas"]');
     this.photo = this.querySelector('[data-el="sc-photo"]');
     this.captureBtn = this.querySelector('[data-el="sc-capture-btn"]');
+    this.proceedBtn = this.querySelector('[data-el="sc-proceed-btn"]');
+
+    // Mirror the video preview, it's hard to take a selfie otherwise
+    this.video.style.transform = 'scaleX(-1)';
 
     this.containers = {
       takingState: this.querySelector('[data-container-state="taking"]'),
@@ -25,7 +29,7 @@ class SelfieCapture extends HTMLElement {
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
       .then(stream => this.video.srcObject = stream)
-      .catch(err => alert('Camera access denied: ' + err));
+  .catch(err => this.showError('Camera access denied: ' + err));
   }
 
   onCaptureSelfie() {
@@ -40,15 +44,48 @@ class SelfieCapture extends HTMLElement {
     this.setSelfieTaken(true);
   }
 
+  async onProceed() {
+    // Get the data URL from the <img>
+    const dataUrl = this.photo.src;
+    if (!dataUrl) {
+      this.showError('No selfie to upload!');
+      return;
+    }
+
+    // Convert dataURL to Blob
+    const blob = await (await fetch(dataUrl)).blob();
+    const formData = new FormData();
+    formData.append('file', blob, 'selfie.jpg');
+
+    const baseUrl = import.meta.env.VITE_FASTAPI_BASE_URL || 'http://localhost:9000';
+    try {
+      const res = await fetch(`${baseUrl}/api/v1/use-face`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      this.setSelfieTaken(false);
+      // TODO: Implement redirect here once the next page is done
+      alert(data.message || 'Uploaded!');
+    } catch (e) {
+      this.showError('Upload failed: ' + (e && e.message ? e.message : String(e)));
+    }
+  }
+
   connectedCallback() {
     this.setup();
     this._captureSelfieListener = this.onCaptureSelfie.bind(this);
     this.captureBtn.addEventListener('click', this._captureSelfieListener);
+    this._proceedListener = this.onProceed.bind(this);
+    this.proceedBtn.addEventListener('click', this._proceedListener);
   }
 
   disconnectedCallback() {
     if (this._captureSelfieListener) {
       this.captureBtn.removeEventListener('click', this._captureSelfieListener);
+    }
+    if (this._proceedListener) {
+      this.proceedBtn.removeEventListener('click', this._proceedListener);
     }
   }
 
@@ -61,6 +98,12 @@ class SelfieCapture extends HTMLElement {
       this.containers.takingState.classList.remove('hidden');
       this.containers.takenState.classList.add('hidden');
     }
+  }
+
+  showError(msg) {
+    this.setSelfieTaken(false);
+    // TODO: Implement toast messages later
+    alert(msg);
   }
 }
 

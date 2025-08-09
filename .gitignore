@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backend
+.env
+uploads/*
+!uploads/.gitkeep
+
+__pycache__/
+*.pyc
