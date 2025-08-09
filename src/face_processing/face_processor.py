@@ -9,7 +9,6 @@ UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads")
 
 def process_face_upload(file):
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    file.file.seek(0)
     file_location, safe_name = save_upload_file(UPLOAD_FOLDER, file, timestamp)
 
     # Get extension for cropping

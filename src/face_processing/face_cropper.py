@@ -13,6 +13,9 @@ face_cascade = cv2.CascadeClassifier(FACE_CLASSIFIER)
 
 def crop_face(image_path, output_folder, timestamp, ext='.png'):
     img = cv2.imread(image_path)
+    if img is None:
+        return None  # Image failed to load
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
     if len(faces) == 0:

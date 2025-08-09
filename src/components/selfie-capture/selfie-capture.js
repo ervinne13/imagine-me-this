@@ -57,7 +57,7 @@ class SelfieCapture extends HTMLElement {
     const formData = new FormData();
     formData.append('file', blob, 'selfie.jpg');
 
-    const baseUrl = import.meta.env.VITE_FASTAPI_BASE_URL || import.meta.env.FASTAPI_BASE_URL || 'http://localhost:9000';
+    const baseUrl = import.meta.env.VITE_FASTAPI_BASE_URL || 'http://localhost:9000';
     try {
       const res = await fetch(`${baseUrl}/api/v1/use-face`, {
         method: 'POST',
