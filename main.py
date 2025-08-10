@@ -1,9 +1,13 @@
 import os
+from typing import List
+from dotenv import load_dotenv
+from pydantic import BaseModel
 from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
+
 from src.face_processing.face_processor import process_face_upload
+from src.prompt.prompt_options import COMPOSITIONS, TYPES, STYLES, BACKGROUNDS, EXTRAS
 
 load_dotenv()
 
@@ -24,6 +28,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class PromptRequest(BaseModel):
+    composition: int
+    type: int
+    style: int
+    background: int
+    extras: List[int]
+
+@app.post("/api/v1/prompt")
+async def prompt_endpoint(payload: PromptRequest):
+    # For now, just echo back the received data
+    return JSONResponse(content=payload.dict())
+
+
+@app.get("/api/v1/prompt-options")
+async def prompt_options():
+    return JSONResponse(content={
+        "composition": COMPOSITIONS,
+        "type": TYPES,
+        "style": STYLES,
+        "background": BACKGROUNDS,
+        "extras": EXTRAS
+    })
 
 @app.post("/api/v1/use-face")
 async def use_face(request: Request, file: UploadFile = File(...)):

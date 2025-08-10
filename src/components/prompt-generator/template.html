@@ -1,0 +1,30 @@
+<div class="prompt-generator">
+  <form class="prompt-generator__form" data-el="form">
+    <label class="prompt-generator__label">Composition:
+      <select class="prompt-generator__select" name="composition" required data-el="composition">
+        <option value="">Select...</option>
+      </select>
+    </label>
+    <label class="prompt-generator__label">Type:
+      <select class="prompt-generator__select" name="type" required data-el="type">
+        <option value="">Select...</option>
+      </select>
+    </label>
+    <label class="prompt-generator__label">Style:
+      <select class="prompt-generator__select" name="style" required data-el="style">
+        <option value="">Select...</option>
+      </select>
+    </label>
+    <label class="prompt-generator__label">Background:
+      <select class="prompt-generator__select" name="background" required data-el="background">
+        <option value="">Select...</option>
+      </select>
+    </label>
+    <fieldset class="prompt-generator__extras">
+      <legend class="prompt-generator__extras-title">Extra Details</legend>
+      <div class="prompt-generator__extras-list" data-el="extras"></div>
+    </fieldset>
+    <button class="prompt-generator__submit" type="submit">Generate</button>
+  </form>
+  <div class="prompt-generator__result" data-el="result"></div>
+</div>

@@ -64,9 +64,12 @@ class SelfieCapture extends HTMLElement {
         body: formData
       });
       const data = await res.json();
-      // TODO: Implement redirect here once the next page is done, remove console logs too
-      console.log('Upload response:', data);
-      alert(data.message || 'Uploaded!');
+      // Redirect to generate.html after successful upload
+      if (res.ok) {
+        window.location.href = '/generate.html';
+      } else {
+        this.showError(data.message || 'Upload failed!');
+      }
     } catch (e) {
       this.showError('Upload failed: ' + (e && e.message ? e.message : String(e)));
     }

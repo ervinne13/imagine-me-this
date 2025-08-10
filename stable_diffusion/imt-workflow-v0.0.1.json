@@ -1,0 +1,155 @@
+{
+  "1": {
+    "inputs": {
+      "image": "20250810154710-upscaled.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "3": {
+    "inputs": {
+      "ckpt_name": "cyberrealisticPony_v110.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "4": {
+    "inputs": {
+      "text": "beautiful Korean noblewoman wearing a traditional hanbok, Joseon dynasty, intricate embroidery, serene expression, traditional Korean hairstyle with hairpin, cinematic lighting, 8k, highly detailed\n",
+      "clip": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Prompt_Main"
+    }
+  },
+  "5": {
+    "inputs": {
+      "stop_at_clip_layer": -2,
+      "clip": [
+        "3",
+        1
+      ]
+    },
+    "class_type": "CLIPSetLastLayer",
+    "_meta": {
+      "title": "CLIP Set Last Layer"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": "nude, naked, topless, bottomless, explicit, nsfw, porn, hentai, erotic, lewd, sexual, adult content, r18, r-18, uncensored, rule34, suggestive, provocative, risqué, obscene, indecent, sex, intercourse, copulation, masturbation, sexual fluids, genitalia, penis, vagina, nipples, areola, breasts, bust, cleavage, underboob, sideboob, cameltoe, groin, crotch, anus, buttocks, ass, asscrack, spread legs, open legs, gaping, exposed, straddling, grinding, twerking, moaning, licking, sucking, groping, fondling, sex toy, dildo, vibrator, bondage, bdsm, fetish, kinky, tentacle, orgasm, cum, ejaculation, wet, see-through clothing, sheer, lingerie, underwear, panties, thong, micro bikini, bikini lift, wardrobe malfunction, overly detailed skin texture, exaggerated anatomy, hyperrealistic genitals\n",
+      "clip": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Prompt_Negative"
+    }
+  },
+  "7": {
+    "inputs": {
+      "seed": 16918431947025,
+      "steps": 20,
+      "cfg": 7,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "karras",
+      "denoise": 1,
+      "model": [
+        "3",
+        0
+      ],
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "6",
+        0
+      ],
+      "latent_image": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler_Main"
+    }
+  },
+  "8": {
+    "inputs": {
+      "width": 512,
+      "height": 768,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Portrait"
+    }
+  },
+  "9": {
+    "inputs": {
+      "samples": [
+        "7",
+        0
+      ],
+      "vae": [
+        "3",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "11": {
+    "inputs": {
+      "enabled": true,
+      "swap_model": "inswapper_128.onnx",
+      "facedetection": "retinaface_mobile0.25",
+      "face_restore_model": "codeformer-v0.1.0.pth",
+      "face_restore_visibility": 1,
+      "codeformer_weight": 0.6000000000000001,
+      "detect_gender_input": "female",
+      "detect_gender_source": "female",
+      "input_faces_index": "0",
+      "source_faces_index": "0",
+      "console_log_level": 1,
+      "input_image": [
+        "9",
+        0
+      ],
+      "source_image": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "ReActorFaceSwap",
+    "_meta": {
+      "title": "ReActor_Swap"
+    }
+  },
+  "12": {
+    "inputs": {
+      "images": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Result Preview"
+    }
+  }
+}
