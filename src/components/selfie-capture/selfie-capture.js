@@ -29,7 +29,7 @@ class SelfieCapture extends HTMLElement {
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
       .then(stream => this.video.srcObject = stream)
-  .catch(err => this.showError('Camera access denied: ' + err));
+      .catch(err => this.showError('Camera access denied: ' + err));
   }
 
   onCaptureSelfie() {
@@ -64,8 +64,8 @@ class SelfieCapture extends HTMLElement {
         body: formData
       });
       const data = await res.json();
-      this.setSelfieTaken(false);
-      // TODO: Implement redirect here once the next page is done
+      // TODO: Implement redirect here once the next page is done, remove console logs too
+      console.log('Upload response:', data);
       alert(data.message || 'Uploaded!');
     } catch (e) {
       this.showError('Upload failed: ' + (e && e.message ? e.message : String(e)));
