@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -26,20 +26,20 @@ app.add_middleware(
 
 
 @app.post("/api/v1/use-face")
-async def use_face(file: UploadFile = File(...)):
-    # Validate file size (max 5MB) without loading entire file into memory
+async def use_face(request: Request, file: UploadFile = File(...)):
+    # Validate file size (max 5MB) using Content-Length header
     max_size = 5 * 1024 * 1024  # 5MB
-    total = 0
-    chunk_size = 1024 * 1024  # 1MB
-    file.file.seek(0)
-    while True:
-        chunk = file.file.read(chunk_size)
-        if not chunk:
-            break
-        total += len(chunk)
-        if total > max_size:
+    content_length = request.headers.get("content-length")
+    if content_length is not None:
+        try:
+            if int(content_length) > max_size:
+                return JSONResponse(
+                    content={"message": "File too large. Max 5MB allowed."}, status_code=413
+                )
+        except ValueError:
+            # If Content-Length is not an integer, treat as invalid
             return JSONResponse(
-                content={"message": "File too large. Max 5MB allowed."}, status_code=413
+                content={"message": "Invalid Content-Length header."}, status_code=400
             )
     file.file.seek(0)  # Reset pointer so we don't crash the next calls
 
