@@ -1,13 +1,15 @@
 import os
+import base64
 from typing import List
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, UploadFile, File
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.face_processing.face_processor import process_face_upload
 from src.prompt.prompt_options import COMPOSITIONS, TYPES, STYLES, BACKGROUNDS, EXTRAS
+from src.prompt.send_prompt import send_prompt, PromptError
 
 load_dotenv()
 
@@ -28,6 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class PromptRequest(BaseModel):
     composition: int
     type: int
@@ -35,21 +38,34 @@ class PromptRequest(BaseModel):
     background: int
     extras: List[int]
 
+
 @app.post("/api/v1/prompt")
 async def prompt_endpoint(payload: PromptRequest):
-    # For now, just echo back the received data
-    return JSONResponse(content=payload.dict())
+    try:
+        result = send_prompt()
+        if not os.path.exists(result['image_path']):
+            return JSONResponse(content={"message": "Sample output image not found"}, status_code=404)
+        return FileResponse(result['image_path'], media_type='image/jpeg')
+    except PromptError as e:
+        return JSONResponse(content={"message": str(e)}, status_code=e.code)
+    except Exception as e:
+        return JSONResponse(
+            content={"message": f"Internal server error: {e}"}, status_code=500
+        )
 
 
 @app.get("/api/v1/prompt-options")
 async def prompt_options():
-    return JSONResponse(content={
-        "composition": COMPOSITIONS,
-        "type": TYPES,
-        "style": STYLES,
-        "background": BACKGROUNDS,
-        "extras": EXTRAS
-    })
+    return JSONResponse(
+        content={
+            "composition": COMPOSITIONS,
+            "type": TYPES,
+            "style": STYLES,
+            "background": BACKGROUNDS,
+            "extras": EXTRAS,
+        }
+    )
+
 
 @app.post("/api/v1/use-face")
 async def use_face(request: Request, file: UploadFile = File(...)):
@@ -60,7 +76,8 @@ async def use_face(request: Request, file: UploadFile = File(...)):
         try:
             if int(content_length) > max_size:
                 return JSONResponse(
-                    content={"message": "File too large. Max 5MB allowed."}, status_code=413
+                    content={"message": "File too large. Max 5MB allowed."},
+                    status_code=413,
                 )
         except ValueError:
             # If Content-Length is not an integer, treat as invalid

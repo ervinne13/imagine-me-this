@@ -30,6 +30,12 @@ class PromptGenerator extends HTMLElement {
     this.options['background'] = this.querySelector('[name="background"]');
     this.options['extras'] = this.querySelector('[data-el="extras"]');
     this.options['result'] = this.querySelector('[data-el="result"]');
+    this.options['submitBtn'] = this.querySelector('[data-el="submit-btn"]');
+    this.options['loading'] = this.querySelector('[data-el="loading"]');
+    this.options['imageContainer'] = this.querySelector('[data-el="image-container"]');
+    this.options['resultImage'] = this.querySelector('[data-el="result-image"]');
+    this.options['downloadBtn'] = this.querySelector('[data-el="download-btn"]');
+    this.options['againBtn'] = this.querySelector('[data-el="again-btn"]');
   }
 
   populateOptions(apiOptions) {
@@ -70,9 +76,23 @@ class PromptGenerator extends HTMLElement {
           background: parseInt(data.get('background'), 10),
           extras: data.getAll('extras').map(x => parseInt(x, 10))
         };
+        this.showLoading(true);
         await this.sendPrompt(payload);
+        this.showLoading(false);
       });
     }
+    if (this.options['againBtn']) {
+      this.options['againBtn'].addEventListener('click', (e) => {
+        e.preventDefault();
+        this.setImageState(false);
+      });
+    }
+    // Download handled by <a> tag natively
+  }
+
+  showLoading(show = true) {
+    if (this.options['submitBtn']) this.options['submitBtn'].style.display = show ? 'none' : '';
+    if (this.options['loading']) this.options['loading'].style.display = show ? '' : 'none';
   }
 
   async sendPrompt(payload) {
@@ -82,10 +102,41 @@ class PromptGenerator extends HTMLElement {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const result = await res.json();
-    const resultDiv = this.options['result'];
-    if (resultDiv) {
-      resultDiv.textContent = JSON.stringify(result, null, 2);
+    if (res.ok) {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      this.showResultImage(url);
+    } else {
+      // Show error in result div
+      const resultDiv = this.options['result'];
+      if (resultDiv) {
+        let msg = 'Failed to generate image';
+        try {
+          const err = await res.json();
+          msg = err.message || msg;
+        } catch {}
+        resultDiv.textContent = msg;
+      }
+    }
+  }
+
+  showResultImage(url) {
+    // Hide form, show image container
+    if (this.options['form']) this.options['form'].classList.add('hidden');
+    if (this.options['imageContainer']) this.options['imageContainer'].classList.remove('hidden');
+    if (this.options['resultImage']) this.options['resultImage'].src = url;
+    if (this.options['downloadBtn']) this.options['downloadBtn'].href = url;
+  }
+
+  setImageState(show = true) {
+    if (show) {
+      if (this.options['form']) this.options['form'].classList.add('hidden');
+      if (this.options['imageContainer']) this.options['imageContainer'].classList.remove('hidden');
+    } else {
+      if (this.options['form']) this.options['form'].classList.remove('hidden');
+      if (this.options['imageContainer']) this.options['imageContainer'].classList.add('hidden');
+      if (this.options['resultImage']) this.options['resultImage'].src = '';
+      if (this.options['downloadBtn']) this.options['downloadBtn'].href = '#';
     }
   }
 }

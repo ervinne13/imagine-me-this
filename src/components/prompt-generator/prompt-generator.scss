@@ -1,22 +1,35 @@
+// TODO: Unify this later on a separate SCSS
+.hidden {
+  display: none;
+}
+
 .prompt-generator {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: start;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  select,
+  input[type="checkbox"] {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
 }
 
-.prompt-generator label,
-.prompt-generator fieldset {
-  display: block;
-  margin-bottom: 1rem;
-}
-
-.prompt-generator select,
-.prompt-generator input[type="checkbox"] {
-  margin-left: 0.5rem;
-}
 
 #prompt-result {
   margin-top: 1.5rem;
@@ -25,4 +38,5 @@
   border-radius: 4px;
   font-family: monospace;
   white-space: pre-wrap;
+  font-size: 0.9rem;
 }

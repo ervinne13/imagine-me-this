@@ -24,7 +24,24 @@
       <legend class="prompt-generator__extras-title">Extra Details</legend>
       <div class="prompt-generator__extras-list" data-el="extras"></div>
     </fieldset>
-    <button class="prompt-generator__submit" type="submit">Generate</button>
+    <button class="prompt-generator__submit btn" type="submit" data-el="submit-btn">Generate</button>
+    <span class="prompt-generator__loading" data-el="loading" style="display:none">
+      <!-- Simple spinner SVG -->
+      <svg width="24" height="24" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="#888" stroke-width="5" stroke-linecap="round" stroke-dasharray="31.4 31.4" transform="rotate(-90 25 25)">
+          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </span>
   </form>
-  <div class="prompt-generator__result" data-el="result"></div>
+  <div class="prompt-generator__image-container hidden" data-el="image-container">
+    <div class="prompt-generator__image-message">
+      Download your generated image before generating a new one to avoid losing your work
+    </div>
+    <img class="prompt-generator__image" data-el="result-image" src="" alt="Generated result" />
+    <div class="prompt-generator__image-actions">
+      <a class="prompt-generator__download-btn btn" data-el="download-btn" href="#" download="generated.jpg">Download</a>
+      <button class="prompt-generator__again-btn btn" data-el="again-btn">Generate Again</button>
+    </div>
+  </div>
 </div>

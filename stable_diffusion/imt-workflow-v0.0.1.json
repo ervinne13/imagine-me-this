@@ -140,16 +140,16 @@
       "title": "ReActor_Swap"
     }
   },
-  "12": {
+  "13": {
     "inputs": {
       "images": [
         "11",
         0
       ]
     },
-    "class_type": "PreviewImage",
+    "class_type": "SaveImageWebsocket",
     "_meta": {
-      "title": "Result Preview"
+      "title": "SaveImageWebsocket"
     }
   }
 }
